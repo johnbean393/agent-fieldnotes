@@ -92,6 +92,15 @@ def normalize(rows):
             if not old.get('_conflicting_trigger'):
                 old['trigger'] = old.get('trigger') or row.get('trigger')
             continue
+        if old and old['conversation']==row['conversation'] and row['kind']=='turn':
+            # A later snapshot can supply the completion for an existing turn.
+            retained = row if stamp < old['stamp'] else old
+            other = old if retained is row else row
+            if retained['end_stamp'] is None and other['end_stamp'] is not None:
+                if other['end_stamp'] >= retained['stamp']:
+                    retained['end_stamp'] = other['end_stamp']
+            unique[key] = retained
+            continue
         if old is None or stamp<old['stamp']:
             unique[key] = row
     return sorted(unique.values(),key=lambda row:row['stamp'])
