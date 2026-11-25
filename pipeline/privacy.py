@@ -15,6 +15,13 @@ LABELS = ['person','full_name','email','phone_number','address','date_of_birth',
           'account_id','password','secret','api_key','access_token','recovery_code']
 
 
+def load_model(name):
+    if not name or name.casefold() == 'none':
+        raise ValueError('A local PII model is required for prompt labeling')
+    from gliner2 import GLiNER2
+    return GLiNER2.from_pretrained(name)
+
+
 def redact(text, model=None):
     spans = [(s['start'],s['end'],'CREDENTIAL') for s in credential_spans(text)]
     for label, pattern in PATTERNS.items():

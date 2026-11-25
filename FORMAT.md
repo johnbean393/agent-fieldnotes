@@ -14,7 +14,7 @@ Supply private UTF-8 JSON Lines in chronological or arbitrary order. Each line i
 | `input_tokens`, `output_tokens` | Optional integer response counters. Normalize input to include cache reads and writes. |
 | `cache_read` | Optional nonnegative subset of input tokens |
 | `end` | Optional timestamp of a completed `turn`, used to measure overlapping work |
-| `failed` | Optional boolean source-reported tool failure signal |
+| `failed` | Optional boolean source-reported tool failure, emitted only for a recorded terminal result |
 | `measure` | Optional public-safe tool result label, such as `shell result` |
 
-Emit human-authored inputs as prompts. System notices, delegated agent inputs and tool results have separate roles. Emit each completed model response using its native ID. Use a verified causal link to set `trigger`. Leave unsupported optional fields absent. Keep IDs, timestamps, and raw content in the private input. Generated text excerpts use coarse dates and keyed public IDs.
+Emit human-authored inputs as prompts. System notices, delegated agent inputs and tool results have separate roles. Emit each completed model response using its native ID. Use a verified causal link to set `trigger`. Leave unsupported optional fields absent. Keep IDs, timestamps, and raw content in the private input. The static build contains telemetry and derived labels. Conversation IDs are keyed and prompt text stays private.

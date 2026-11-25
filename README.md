@@ -1,8 +1,8 @@
 # Agent Fieldnotes
 
-A static dashboard for coding-agent activity, conversation patterns, and a searchable prompt archive. This source-only release includes the dashboard frontend and a portable version of the local processing pipeline. There are no personal prompt archives or generated datasets in the repository.
+A static dashboard for coding-agent activity and conversation patterns. This source-only release includes the dashboard frontend and a portable local pipeline.
 
-[Copy the recreation prompt](RECREATE.md)
+[Copy the recreation prompt](RECREATE.md) · [Additional sources and OpenRouter labeling](EXTRA_SOURCES.md)
 
 ## Run the synthetic demo
 
@@ -27,7 +27,7 @@ python3 pipeline/fieldnotes.py collect \
 python3 pipeline/fieldnotes.py build --input .fieldnotes/events.jsonl --timezone America/New_York
 ```
 
-The default build includes aggregate activity. Use the generated site's Usage and Method views to check what the sources support. Cursor's adapter currently reports prompt activity only. Codex and Claude adapters report observed response IDs when available. Claude's native importer uses root conversations. Add new agents through the [event format](FORMAT.md) and supply multiple `--input` files to combine them.
+The default build includes aggregate activity. Use the generated site's Usage and Method views to check what the sources support. Cursor's adapter currently reports prompt activity only. Codex and Claude adapters report observed response IDs when available. Claude's native importer uses root conversations. Add new agents through the [event format](FORMAT.md) and supply multiple `--input` files to combine them. Each build writes its own agent-by-month coverage table into the Method view.
 
 To add Codex reviews launched by Claude, run the optional linkage stage and pass its private result as a second input.
 
@@ -53,10 +53,8 @@ python3 -m venv .venv
 
 Set `TYPESAFE_API_KEY` in your local environment before enabling `--jev`. Optionally set `JEV_MODEL`. Jev receives scrubbed prompt text and structured questions. Labeling results are cached locally by payload, model and rubric. Review the labels and source coverage before interpreting a trend.
 
-Add `--include-prompts` to build the browsable text archive locally. Review every excerpt you intend to publish. Automated redaction can miss secrets and private context. Keep raw inputs, private state, generated builds and API credentials out of this repository. Keep the private seed when refreshing so public archive IDs remain stable.
-
 ## Publish a reviewed build
 
-The generated `dist/` is the static site. Host it at the root of a domain or use ChatGPT Sites with your own hosting project. The source release contains no hosting identity. Review the exact generated files before publishing telemetry or excerpts, especially on a public site.
+The generated `dist/` is the static site. Host it at the root of a domain or use ChatGPT Sites with your own hosting project. The source release contains no hosting identity. Publish only telemetry and derived labels. Keep prompt text, raw inputs, and private state outside the site and out of Git.
 
 The frontend shows views supported by the supplied data. Missing telemetry remains unavailable. Iteration counts describe distinct recorded model responses. Elapsed time uses observed timestamps and can include waiting.

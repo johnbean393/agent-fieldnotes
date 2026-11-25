@@ -30,6 +30,7 @@ function node(tag, text, cls) {
 }
 const formatValue = (v, digits=1) => new Intl.NumberFormat('en-US', {maximumFractionDigits:digits}).format(v);
 const paint = ['var(--accent)','var(--claude)','var(--cursor)','var(--zcode)'];
+const seriesColor = i => paint[i] ?? ['#ad6b30','#6654a4','#1e7967','#8f4d83'][i % 4];
 
 function renderBars(target, rows, maximum) {
   const view = node('div', null, 'native-bars');
@@ -39,7 +40,7 @@ function renderBars(target, rows, maximum) {
     for (const [i, portion] of segments.entries()) {
       const fill = node('div', null, 'native-fill');
       fill.style.width = 100 * portion / maximum + '%';
-      fill.style.background = paint[i];
+      fill.style.background = seriesColor(i);
       track.append(fill);
     }
     row.append(node('span', label), track, node('span', value, 'tabular'));
@@ -91,7 +92,7 @@ function renderGraph(target, labels, series, suffix='', waterfall=false) {
         const end = i===0||i===labels.length-1 ? value : previous+value;
         const start = i===0||i===labels.length-1 ? 0 : previous;
         const width=Math.min(64,(w-left-right)/labels.length*.65);
-        const rect=item('rect',{x:x(i)-width/2,y:y(Math.max(start,end)),width,height:Math.abs(y(start)-y(end)),fill:i===0||i===labels.length-1?paint[0]:paint[1],rx:2});
+        const rect=item('rect',{x:x(i)-width/2,y:y(Math.max(start,end)),width,height:Math.abs(y(start)-y(end)),fill:i===0||i===labels.length-1?seriesColor(0):seriesColor(1),rx:2});
         const tip=document.createElementNS(ns,'title');tip.textContent=labels[i]+': '+formatValue(value)+suffix;rect.append(tip);
         previous=end;
       }
@@ -101,13 +102,13 @@ function renderGraph(target, labels, series, suffix='', waterfall=false) {
     for (const [j,s] of series.entries()) {
       if (s.line) {
         const points=s.values.map((v,i)=>v==null?null:`${x(i)},${y(v)}`);
-        for (let i=1;i<points.length;i++) if (points[i-1]&&points[i]) item('path',{d:`M${points[i-1]} L${points[i]}`,stroke:paint[j],fill:'none','stroke-width':2});
+        for (let i=1;i<points.length;i++) if (points[i-1]&&points[i]) item('path',{d:`M${points[i-1]} L${points[i]}`,stroke:seriesColor(j),fill:'none','stroke-width':2});
       }
       for (const [i,v] of s.values.entries()) {
         if (v==null) continue;
         const barWidth=(w-left-right)/labels.length*.62;
         const start=isLine?0:series.slice(0,j).reduce((sum,row)=>sum+(row.values[i]||0),0);
-        const mark=s.line?item('circle',{cx:x(i),cy:y(v),r:4,fill:paint[j]}):item('rect',{x:x(i)-barWidth/2,y:y(start+v),width:barWidth,height:y(start)-y(start+v),fill:paint[j]});
+        const mark=s.line?item('circle',{cx:x(i),cy:y(v),r:4,fill:seriesColor(j)}):item('rect',{x:x(i)-barWidth/2,y:y(start+v),width:barWidth,height:y(start)-y(start+v),fill:seriesColor(j)});
         const tip=document.createElementNS(ns,'title');tip.textContent=[labels[i],s.name,formatValue(v)+suffix].filter(Boolean).join(' · ');mark.append(tip);
       }
     }
@@ -118,7 +119,7 @@ function renderGraph(target, labels, series, suffix='', waterfall=false) {
     const legend=node('div',null,'legend');
     for (const [i,s] of series.entries()) {
       const label=node('span'),swatch=node('i',null,'swatch');
-      swatch.style.background=paint[i];label.append(swatch,document.createTextNode(s.name));legend.append(label);
+      swatch.style.background=seriesColor(i);label.append(swatch,document.createTextNode(s.name));legend.append(label);
     }
     target.append(legend);
   }
